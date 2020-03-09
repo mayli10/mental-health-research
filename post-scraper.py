@@ -1,9 +1,11 @@
-import pandas as pd
 import requests
 import json
 import csv
 import time
 import datetime
+import pickle
+
+post_ids = []
 
 def getPushshiftData(after, before, sub):
     url = 'https://api.pushshift.io/reddit/search/submission?subreddit='+str(sub)+'&after='+str(after)+'&before='+str(before)+'&size=1000'
@@ -22,7 +24,7 @@ def collectSubData(subm):
     except KeyError:
         flair = "NaN"
     author = subm['author']
-    sub_id = subm['id']
+    post_id = subm['id']
     score = subm['score']
     created = datetime.datetime.fromtimestamp(subm['created_utc']) #1520561700.0
     num_comments = subm['num_comments']
@@ -32,8 +34,10 @@ def collectSubData(subm):
     over_18 = subm["over_18"]
     is_video = subm["is_video"]
 
-    subData.append((sub_id,title,url,author,score,created,num_comments,permalink,flair, text, stickied, over_18, is_video))
-    subStats[sub_id] = subData
+    post_ids.append(post_id)
+
+    subData.append((post_id,title,url,author,score,created,num_comments,permalink,flair, text, stickied, over_18, is_video))
+    subStats[post_id] = subData
 
 #Subreddit to query
 sub='EDAnonymous'
@@ -67,7 +71,7 @@ print(list(subStats.values())[-1][0][1] + " created: " + str(list(subStats.value
 
 def updateSubs_file():
     upload_count = 0
-    location = "./reddit-data-final"
+    location = "./reddit-data-final2"
     print("input filename of submission file, please add .csv")
     filename = input()
     file = location + filename
@@ -81,3 +85,9 @@ def updateSubs_file():
 
         print(str(upload_count) + " submissions have been uploaded")
 updateSubs_file()
+
+with open('./post-ids.p', 'wb') as fp:
+    pickle.dump(post_ids, fp)
+
+
+########################### Get Comments #######################

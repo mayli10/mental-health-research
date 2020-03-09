@@ -1,54 +1,51 @@
 import statistics
 import json
-import glob
 
-files = glob.glob("./reddit-files/comments/*.json")
+with open('../reddit-comments-final.json') as json_file:
+    data = json.load(json_file, strict=False)
 
-comments = []
-deleted_authors = []
-bot_authors = []
-texts_words_lens = []
-author_dict = {}
-upvotes = []
+    texts_words_lens = []
+    author_dict = {}
+    comments_per_post_dict = {}
+    deleted_authors = 0
+    bot_authors = 0
+    removed_comments = 0
+    total_comments = 0
+    scores = []
 
-for file in files:
-    with open(file) as json_file:
-        data = json.load(json_file, strict=False)
-
-        def get_comments(data):
-            if type(data) is list:
-                for item in data:
-                    get_comments(item)
+    for comment in data:
+        if comment["Author"] == '[deleted]':
+            deleted_authors += 1
+        if comment["Author"] == 'Bot_Metric':
+            bot_authors += 1
+        elif comment["Text"] == '[removed]':
+            removed_comments += 1
+        else:
+            total_comments += 1
+            words = comment["Text"].split()
+            texts_words_lens.append(len(words))
+            scores.append(int(comment["Score"]))
+            if author_dict.get(comment["Author"]) == None:
+                author_dict[comment["Author"]] = 1
             else:
-                if data.has_key("Comment ID"):
-                    if data["Author"] == '[deleted]':
-                        deleted_authors.append(data)
-                    elif data["Author"] == 'Bot_Metric':
-                        bot_authors.append(data)
-                    else:
-                        comments.append(data)
-                        words = data["Text"].split()
-                        texts_words_lens.append(len(words))
-                        upvotes.append(data["Upvotes"])
-                        if author_dict.get(data["Author"]) == None:
-                            author_dict[data["Author"]] = 1
-                        else:
-                            author_dict[data["Author"]] += 1
-                else:
-                    comment_ids = data.keys()
-                    for c_id in comment_ids:
-                        get_comments(data[c_id])
-        get_comments(data)
+                author_dict[comment["Author"]] += 1
+            if comments_per_post_dict.get(comment["Parent ID"]) == None:
+                comments_per_post_dict[comment["Parent ID"]] = 1
+            else:
+                comments_per_post_dict[comment["Parent ID"]] += 1
 
-print "Number of deleted authors: " + str(len(deleted_authors))
-print "Number of bot authors: " + str(len(bot_authors))
-print "Total number of comments: " + str(len(comments))
-print "Mean comment length (words): " + str(statistics.mean(texts_words_lens))
-print "Median comment length (words): " + str(statistics.median(texts_words_lens))
-print "Population Standard Deviation of comment length (words): " + str(statistics.pstdev(texts_words_lens))
-print "Sample Standard Deviation of comment length (words): " + str(statistics.stdev(texts_words_lens))
-print "Number of unique authors: " + str(len(author_dict.keys()))
-print "Mean comments per user: " + str(statistics.mean(author_dict.values()))
-print "Median comments per user: " + str(statistics.median(author_dict.values()))
-print "Mean upvotes of comments: " + str(statistics.mean(upvotes))
-print "Median upvotes of comments: " + str(statistics.median(upvotes))
+
+    print("Number of deleted authors: " + str(deleted_authors))
+    print("Number of bot authors: " + str(bot_authors))
+    print("Number of removed comments: " + str(removed_comments))
+    print("Total number of non-deleted comments: " + str(total_comments))
+    print("Mean comment length (words): " + str(statistics.mean(texts_words_lens)))
+    print("Median comment length (words): " + str(statistics.median(texts_words_lens)))
+    print("Population Standard Deviation of comment length (words): " + str(statistics.pstdev(texts_words_lens)))
+    print("Number of unique authors: " + str(len(author_dict.keys())))
+    print("Mean comments per author: " + str(statistics.mean(author_dict.values())))
+    print("Median comments per author: " + str(statistics.median(author_dict.values())))
+    print("Mean comments per post: " + str(statistics.mean(comments_per_post_dict.values())))
+    print("Median comments per post: " + str(statistics.median(comments_per_post.values())))
+    print("Mean scores of comments: " + str(statistics.mean(scores)))
+    print("Median scores of comments: " + str(statistics.median(scores)))
