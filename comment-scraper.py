@@ -12,7 +12,7 @@ commentStats = {}
 with open ('./post-ids.p', 'rb') as fp:
     old_post_ids = pickle.load(fp)
 
-post_ids = old_post_ids[old_post_ids.index("ac5erh") + 1:]
+post_ids = old_post_ids[old_post_ids.index("acvl9n") + 1:]
 print(len(post_ids))
 
 def getPushshiftComments(id):
@@ -40,7 +40,7 @@ def collectCommentData(comment):
     commentStats[comment_id] = commentData
 
 def create_comments_file(id):
-    file = "./comments-csv/comment-" + str(id) + ".csv"
+    file = "./comments-csv/comments-csv/comment-" + str(id) + ".csv"
     with open(file, 'w', newline='', encoding='utf-8') as file:
         a = csv.writer(file, delimiter=',')
         headers = ["Comment ID","Link ID","Parent ID","Author","Score","Publish Date","Permalink","Text", "Stickied", "Is Submitter"]
