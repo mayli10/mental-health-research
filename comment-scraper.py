@@ -5,16 +5,18 @@ import time
 import datetime
 import pickle
 
+# to run: python comment-scraper.py
+
 # get post ids
 with open ('./post-ids.p', 'rb') as fp:
     post_ids = pickle.load(fp)
 
-# get current post ids that have already been turned into a comment file
-with open ('./post_comment_file_ids.p', 'rb') as fp:
-    post_comment_file_ids = pickle.load(fp)
+# # get current post ids that have already been turned into a comment file
+# with open ('./post_comment_file_ids.p', 'rb') as fp:
+#     post_comment_file_ids = pickle.load(fp)
 
 print(len(post_ids))
-print(len(post_comment_file_ids))
+# print(len(post_comment_file_ids))
 
 def getPushshiftComments(id):
     url = 'https://api.pushshift.io/reddit/comment/search/?link_id='+str(id)+'&limit=20000'
@@ -24,7 +26,7 @@ def getPushshiftComments(id):
     data = json.loads(r.text)
     return data['data']
 
-def collectCommentData(comment):
+def collectCommentData(id, comment):
     commentData = list() #list to store data points
     author = comment['author']
     comment_id = comment['id']
@@ -38,7 +40,7 @@ def collectCommentData(comment):
     is_submitter = comment["is_submitter"]
 
     commentData.append((comment_id,link_id,parent_id,author,score,created,permalink,text, stickied,is_submitter))
-    commentStats[first_id][comment_id] = commentData
+    commentStats[id][comment_id] = commentData
 
 def create_comments_file(id):
     file = "./comments/comment-" + str(id) + ".csv"
@@ -54,25 +56,27 @@ def create_comments_file(id):
             a.writerow(fields)
 
 # test for one file
-first_id = post_ids[0]
-commentStats = { first_id : {} }
+# first_id = post_ids[33]
+# commentStats = { first_id : {} }
 
-data = getPushshiftComments(first_id)
+# data = getPushshiftComments(first_id)
 
-for comment in data:
-    collectCommentData(comment)
-create_comments_file(first_id)
-post_comment_file_ids.append(first_id)
+# for comment in data:
+#     collectCommentData(comment)
+# create_comments_file(first_id)
+# post_comment_file_ids.append(first_id)
 
 #######################################################
 # new correct way of getting all comments for each post
 #######################################################
-# for id in post_ids:
-#     data = getPushshiftComments(id)
-#     commentStats[id] = {}
-#     for comment in data:
-#         collectCommentData(comment)
-#     create_comments_file(first_id)
+for id in post_ids:
+    data = getPushshiftComments(id)
+    commentStats = { id : {} }
+
+    for comment in data:
+        collectCommentData(id, comment)
+
+    create_comments_file(id)
 
 #######################################################
 # old wrong way of getting all comments for each post:
@@ -84,8 +88,8 @@ post_comment_file_ids.append(first_id)
 #         create_comments_file(id)
 
 # pickle the comment ids again
-with open('./post_comment_file_ids.p', 'wb') as fp:
-    pickle.dump(post_comment_file_ids, fp)
+# with open('./post_comment_file_ids.p', 'wb') as fp:
+#     pickle.dump(post_comment_file_ids, fp)
 
 # print(str(len(commentStats)) + " comments have added to list")
 # print("1st entry is:")
