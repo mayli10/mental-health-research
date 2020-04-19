@@ -73,11 +73,13 @@ for id in post_ids:
     data = getPushshiftComments(id)
     commentStats = { id : {} }
 
-    for comment in data:
-        collectCommentData(id, comment)
+    if len(data) != 0:
+        for comment in data:
+            collectCommentData(id, comment)
 
-    create_comments_file(id)
+        create_comments_file(id)
 
+print(len(commentStats.keys()))
 #######################################################
 # old wrong way of getting all comments for each post:
 #######################################################
