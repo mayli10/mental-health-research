@@ -9,12 +9,14 @@ import pickle
 
 # get post ids
 with open ('./post-ids.p', 'rb') as fp:
-    post_ids = pickle.load(fp)
+    old_post_ids = pickle.load(fp)
 
 # # get current post ids that have already been turned into a comment file
 # with open ('./post_comment_file_ids.p', 'rb') as fp:
 #     post_comment_file_ids = pickle.load(fp)
 
+print(len(old_post_ids))
+post_ids = old_post_ids[23330:]
 print(len(post_ids))
 # print(len(post_comment_file_ids))
 
