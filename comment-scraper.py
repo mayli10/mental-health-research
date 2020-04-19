@@ -55,15 +55,22 @@ def create_comments_file(id):
                 fields.extend(f)
             a.writerow(fields)
 
+def posts_with_no_comments(pid):
+    file = open("./posts-with-0-comments.txt","w") 
+    file.write(pid + "\n") 
+
 # test for one file
-# first_id = post_ids[33]
+# first_id = "cqhbvq"
 # commentStats = { first_id : {} }
 
 # data = getPushshiftComments(first_id)
 
-# for comment in data:
-#     collectCommentData(comment)
-# create_comments_file(first_id)
+# if len(data) == 0:
+#         posts_with_no_comments(first_id)
+# else:
+#     for comment in data:
+#         collectCommentData(first_id, comment)
+#     create_comments_file(first_id)
 # post_comment_file_ids.append(first_id)
 
 #######################################################
@@ -73,7 +80,9 @@ for id in post_ids:
     data = getPushshiftComments(id)
     commentStats = { id : {} }
 
-    if len(data) != 0:
+    if len(data) == 0:
+        posts_with_no_comments(id)
+    else:
         for comment in data:
             collectCommentData(id, comment)
 
