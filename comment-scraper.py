@@ -16,7 +16,7 @@ with open ('./post-ids.p', 'rb') as fp:
 #     post_comment_file_ids = pickle.load(fp)
 
 print(len(old_post_ids))
-post_ids = old_post_ids[23330:]
+post_ids = old_post_ids[46088:]
 print(len(post_ids))
 # print(len(post_comment_file_ids))
 
